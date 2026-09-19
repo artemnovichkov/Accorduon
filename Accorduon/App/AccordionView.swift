@@ -42,7 +42,6 @@ struct AccordionView: View {
                                 pressure: pressure,
                                 time: timeline.date.timeIntervalSinceReferenceDate
                             )
-                            .padding(.vertical, 12)
                             .gesture(bellowsDrag)
 
                             AccordionEnd {
