@@ -21,42 +21,12 @@ struct AccordionView: View {
 
     var body: some View {
         GeometryReader { screen in
-            // Pad both sides by the larger inset so the bellows stay centered on the fold.
-            let inset = max(screen.safeAreaInsets.leading, screen.safeAreaInsets.trailing) + 16
-            TimelineView(.animation) { timeline in
-                let pressure = audio.synth.pressure
-                VStack(spacing: 0) {
-                    SongBar(song: $song, step: $step, isAirLocked: $isAirLocked, hint: hint, pressure: pressure)
-
-                    GeometryReader { proxy in
-                        // Equal ends keep the bellows in the middle.
-                        let endWidth = proxy.size.width * 0.37
-                        HStack(spacing: 0) {
-                            AccordionEnd {
-                                BassBoard { bassNotes = $0 }
-                            }
-                            .frame(width: endWidth)
-
-                            Bellows(
-                                stretch: stretch,
-                                pressure: pressure,
-                                time: timeline.date.timeIntervalSinceReferenceDate
-                            )
-                            .gesture(bellowsDrag)
-
-                            AccordionEnd {
-                                TrebleKeyboard(notes: keyboardNotes, highlighted: nextNote) { trebleNotes = $0 }
-                            }
-                            .frame(width: endWidth)
-                        }
-                    }
-                    .padding(.bottom)
-                }
-                .padding(.horizontal, inset)
-                .padding(.top, screen.safeAreaInsets.top)
-                .padding(.bottom, screen.safeAreaInsets.bottom)
+            // The cover display is tall and narrow: no room to play, so show the closed accordion.
+            if screen.size.width < screen.size.height {
+                ClosedAccordion(hint: hinge == nil ? "Turn sideways to play" : "Unfold to play")
+            } else {
+                instrument(screen: screen)
             }
-            .ignoresSafeArea()
         }
         .background(Color(white: 0.05))
         .onChange(of: trebleNotes.union(bassNotes)) { _, notes in
@@ -88,6 +58,46 @@ struct AccordionView: View {
                 stretch = degrees / 180
             }
         }
+    }
+
+    @ViewBuilder
+    private func instrument(screen: GeometryProxy) -> some View {
+        // Pad both sides by the larger inset so the bellows stay centered on the fold.
+        let inset = max(screen.safeAreaInsets.leading, screen.safeAreaInsets.trailing) + 16
+        TimelineView(.animation) { timeline in
+            let pressure = audio.synth.pressure
+            VStack(spacing: 0) {
+                SongBar(song: $song, step: $step, isAirLocked: $isAirLocked, hint: hint, pressure: pressure)
+
+                GeometryReader { proxy in
+                    // Equal ends keep the bellows in the middle.
+                    let endWidth = proxy.size.width * 0.37
+                    HStack(spacing: 0) {
+                        AccordionEnd {
+                            BassBoard { bassNotes = $0 }
+                        }
+                        .frame(width: endWidth)
+
+                        Bellows(
+                            stretch: stretch,
+                            pressure: pressure,
+                            time: timeline.date.timeIntervalSinceReferenceDate
+                        )
+                        .gesture(bellowsDrag)
+
+                        AccordionEnd {
+                            TrebleKeyboard(notes: keyboardNotes, highlighted: nextNote) { trebleNotes = $0 }
+                        }
+                        .frame(width: endWidth)
+                    }
+                }
+                .padding(.bottom)
+            }
+            .padding(.horizontal, inset)
+            .padding(.top, screen.safeAreaInsets.top)
+            .padding(.bottom, screen.safeAreaInsets.bottom)
+        }
+        .ignoresSafeArea()
     }
 
     private var hint: String {
@@ -135,6 +145,53 @@ private struct AccordionEnd<Content: View>: View {
                     }
                     .shadow(radius: 8)
             }
+    }
+}
+
+/// Shown on the narrow cover display: the accordion folded shut, gently breathing.
+private struct ClosedAccordion: View {
+    let hint: String
+
+    var body: some View {
+        VStack(spacing: 32) {
+            TimelineView(.animation) { timeline in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+                HStack(spacing: 0) {
+                    AccordionEnd {
+                        // Two columns of bass buttons, dark notes beside light chords.
+                        Grid(horizontalSpacing: 10, verticalSpacing: 14) {
+                            ForEach(0..<6, id: \.self) { _ in
+                                GridRow {
+                                    Circle().fill(Color(white: 0.12))
+                                    Circle().fill(Color(white: 0.95))
+                                }
+                            }
+                        }
+                        .frame(maxHeight: .infinity)
+                    }
+                    .frame(width: 84)
+
+                    Bellows(stretch: 0.05 + 0.05 * sin(time * 2), pressure: 0, time: time)
+                        .frame(width: 30)
+
+                    AccordionEnd {
+                        VStack(spacing: 3) {
+                            ForEach(0..<9, id: \.self) { _ in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color(red: 0.97, green: 0.95, blue: 0.9))
+                            }
+                        }
+                    }
+                    .frame(width: 84)
+                }
+                .frame(height: 320)
+            }
+
+            Label(hint, systemImage: "arrow.left.and.right")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
