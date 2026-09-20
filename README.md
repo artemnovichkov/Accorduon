@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src=".github/images/accorduon.png" width="600" alt="Accorduon on a partially folded iPhone Duo in the simulator">
+  <img src="press-kit/accorduon-hands-dark.png" width="900" alt="Accorduon on an unfolded iPhone Duo, held in two hands">
 </p>
 
 ## How to Play
