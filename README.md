@@ -17,6 +17,17 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.apple.com/app/id6816177737"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="48" alt="Download on the App Store"></a>
+</p>
+
+> [!NOTE]
+> **Accorduon is on the App Store.** [Download it](https://apps.apple.com/app/id6816177737) for iPhone Duo and any other iPhone.
+>
+> This repository is the open-source demo where it all started. The App Store version has grown since then:
+> more registers and songs, onboarding, motion bellows for iPhones without a hinge, and 7 languages.
+> If you enjoy the demo, the full app is a great way to support the project.
+
+<p align="center">
   <img src="press-kit/accorduon-hands-dark.png" width="900" alt="Accorduon on an unfolded iPhone Duo, held in two hands">
 </p>
 

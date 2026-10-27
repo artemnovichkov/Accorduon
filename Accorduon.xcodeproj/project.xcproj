@@ -49,6 +49,7 @@
           "kind": "group",
           "path": "Resources",
           "children": [
+            { "path": "AppIcon.icon", "target-membership": [ "Accorduon/resources" ] },
             { "path": "Assets.xcassets", "target-membership": [ "Accorduon/resources" ] },
           ],
         },
